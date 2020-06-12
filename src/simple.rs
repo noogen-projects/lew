@@ -1,5 +1,10 @@
 use yew::{html, Component, ComponentLink, Html, Properties};
 
+pub use self::toolbar::SimpleToolbar;
+use crate::Widget;
+
+pub mod toolbar;
+
 pub struct SimpleEditor {
     id: String,
     class: String,
@@ -8,6 +13,7 @@ pub struct SimpleEditor {
     name: String,
     placeholder: String,
     text: String,
+    toolbar: Option<Html>,
 }
 
 #[derive(Clone, Properties, Default)]
@@ -32,6 +38,9 @@ pub struct SimpleEditorProps {
 
     #[prop_or_default]
     pub text: String,
+
+    #[prop_or(Some(SimpleToolbar::new().build()))]
+    pub toolbar: Option<Html>,
 }
 
 impl Component for SimpleEditor {
@@ -47,6 +56,7 @@ impl Component for SimpleEditor {
             name: props.name,
             placeholder: props.placeholder,
             text: props.text,
+            toolbar: props.toolbar,
         }
     }
 
@@ -68,7 +78,9 @@ impl Component for SimpleEditor {
     fn view(&self) -> Html {
         html! {
             <div id = &self.id class = &self.class>
-                <textarea cols = self.cols rows = self.rows class = "lew-simple__textarea" name = &self.name placeholder = &self.placeholder>
+                { self.toolbar.as_ref().cloned().unwrap_or(html! {}) }
+                <textarea cols = self.cols rows = self.rows class = "lew-simple__textarea"
+                        name = &self.name placeholder = &self.placeholder>
                     { &self.text }
                 </textarea>
             </div>

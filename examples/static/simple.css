@@ -23,6 +23,14 @@
     list-style: none;
 }
 
+.lew-simple__toolbar_item {
+    fill: #505357;
+}
+
+.lew-simple__toolbar_item:hover {
+    fill: #0560d5;
+}
+
 .lew-simple__tool_bold {
     vertical-align: middle;
     white-space: nowrap;

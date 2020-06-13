@@ -11,6 +11,7 @@ keywords = ["noogen", "editor", "web", "wasm"]
 categories = []
 
 [dependencies]
+derive_more = "0.99"
 yew = "0.16"
 wasm-bindgen = "0.2"
 web-sys = { version = "0.3", features = ["HtmlTextAreaElement"] }

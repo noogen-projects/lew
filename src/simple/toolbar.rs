@@ -56,106 +56,87 @@ impl Widget for SimpleToolbar {
     }
 }
 
-pub struct ReplaceFmt {
-    pub before: String,
-    pub use_selected: bool,
-    pub after: String,
+pub enum ReplaceFmt {
+    Around(String, String),
+    StartLine(String),
 }
 
-impl From<String> for ReplaceFmt {
-    fn from(value: String) -> Self {
-        Self {
-            before: value.clone(),
-            use_selected: true,
-            after: value,
+impl ReplaceFmt {
+    pub fn layout(&self, text: String, start_char: usize, end_char: usize) -> (String, usize) {
+        let selected_chars = end_char - start_char;
+
+        let before: String = text.chars().take(start_char).collect();
+        let selected: String = text.chars().skip(start_char).take(selected_chars).collect();
+        let after: String = text.chars().skip(end_char).collect();
+
+        match self {
+            ReplaceFmt::Around(prefix, suffix) => (
+                before + prefix + &selected + suffix + &after,
+                end_char + prefix.chars().count() + if selected_chars > 0 { suffix.chars().count() } else { 0 },
+            ),
+            ReplaceFmt::StartLine(prefix) => todo!(),
         }
-    }
-}
-
-impl From<&String> for ReplaceFmt {
-    fn from(value: &String) -> Self {
-        value.clone().into()
-    }
-}
-
-impl From<&str> for ReplaceFmt {
-    fn from(value: &str) -> Self {
-        value.to_string().into()
     }
 }
 
 impl<Before: Into<String>, After: Into<String>> From<(Before, After)> for ReplaceFmt {
     fn from((before, after): (Before, After)) -> Self {
-        Self {
-            before: before.into(),
-            use_selected: true,
-            after: after.into(),
-        }
+        Self::Around(before.into(), after.into())
     }
 }
 
-pub fn replace_selected_in_textarea(textarea_selector: impl AsRef<str>, replace_fmt: impl Into<ReplaceFmt>) {
+pub fn replace_selected_in_textarea(textarea_selector: impl AsRef<str>, fmt: impl Into<ReplaceFmt>) {
     if let Ok(Some(element)) = utils::document().query_selector(textarea_selector.as_ref()) {
         if let Ok(textarea) = element.dyn_into::<HtmlTextAreaElement>() {
             let text = textarea.value();
-            let start = textarea
+            let start_char = textarea
                 .selection_start()
                 .map(|start| start.unwrap_or(0) as usize)
                 .unwrap_or(0);
-            let mut end = textarea
+            let mut end_char = textarea
                 .selection_end()
                 .map(|end| end.unwrap_or(0) as usize)
                 .unwrap_or(0);
-            if end < start {
-                end = start;
+            if end_char < start_char {
+                end_char = start_char;
             }
 
-            let before: String = text.chars().take(start).collect();
-            let selected: String = text.chars().skip(start).take(end - start).collect();
-            let after: String = text.chars().skip(end).collect();
-
-            let fmt = replace_fmt.into();
-            let text = before + &fmt.before + if fmt.use_selected { &selected } else { "" } + &fmt.after + &after;
+            let (text, cursor_pos) = fmt.into().layout(text, start_char, end_char);
 
             textarea.set_value(&text);
             textarea.focus().ok();
-            textarea
-                .set_selection_end(Some(
-                    (end + fmt.before.chars().count() + if end - start > 0 { fmt.after.chars().count() } else { 0 })
-                        as u32,
-                ))
-                .ok();
+            textarea.set_selection_end(Some(cursor_pos as u32)).ok();
         }
     }
 }
 
 pub mod tool {
+    use derive_more::{Deref, DerefMut};
+
     use yew::{html, Callback, Html, MouseEvent};
 
     use super::replace_selected_in_textarea;
     use crate::Widget;
 
-    pub struct Header {
+    #[derive(Debug, Clone, Default)]
+    pub struct Tool {
         pub textarea_selector: String,
         pub class: String,
         pub title: String,
         pub size: u32,
     }
 
-    impl Default for Header {
-        fn default() -> Self {
-            Self {
+    #[derive(Debug, Clone, Default, Deref, DerefMut)]
+    pub struct Header(pub Tool);
+
+    impl Header {
+        pub fn new() -> Self {
+            Self(Tool {
                 textarea_selector: ".lew-simple__textarea".to_string(),
                 class: "lew-simple__tool_button".to_string(),
                 title: "Header".to_string(),
                 size: 24,
-            }
-        }
-    }
-
-    impl Header {
-        pub fn new() -> Self {
-            Self::default()
+            })
         }
     }
 
@@ -176,34 +157,24 @@ pub mod tool {
         }
     }
 
-    pub struct Bold {
-        pub textarea_selector: String,
-        pub class: String,
-        pub title: String,
-        pub size: u32,
-    }
+    #[derive(Debug, Clone, Default, Deref, DerefMut)]
+    pub struct Bold(pub Tool);
 
-    impl Default for Bold {
-        fn default() -> Self {
-            Self {
+    impl Bold {
+        pub fn new() -> Self {
+            Self(Tool {
                 textarea_selector: ".lew-simple__textarea".to_string(),
                 class: "lew-simple__tool_button".to_string(),
                 title: "Bold".to_string(),
                 size: 24,
-            }
-        }
-    }
-
-    impl Bold {
-        pub fn new() -> Self {
-            Self::default()
+            })
         }
     }
 
     impl Widget for Bold {
         fn build(&self) -> Html {
             let selector = self.textarea_selector.clone();
-            let onclick = Callback::from(move |_: MouseEvent| replace_selected_in_textarea(&selector, "**"));
+            let onclick = Callback::from(move |_: MouseEvent| replace_selected_in_textarea(&selector, ("**", "**")));
             html! {
                 <button class = &self.class style = format!("width: {0}; height: {0}", self.size)
                         type = "button" title = &self.title onclick = onclick>
@@ -218,34 +189,24 @@ pub mod tool {
         }
     }
 
-    pub struct Italic {
-        pub textarea_selector: String,
-        pub class: String,
-        pub title: String,
-        pub size: u32,
-    }
+    #[derive(Debug, Clone, Default, Deref, DerefMut)]
+    pub struct Italic(pub Tool);
 
-    impl Default for Italic {
-        fn default() -> Self {
-            Self {
+    impl Italic {
+        pub fn new() -> Self {
+            Self(Tool {
                 textarea_selector: ".lew-simple__textarea".to_string(),
                 class: "lew-simple__tool_button".to_string(),
                 title: "Italic".to_string(),
                 size: 24,
-            }
-        }
-    }
-
-    impl Italic {
-        pub fn new() -> Self {
-            Self::default()
+            })
         }
     }
 
     impl Widget for Italic {
         fn build(&self) -> Html {
             let selector = self.textarea_selector.clone();
-            let onclick = Callback::from(move |_: MouseEvent| replace_selected_in_textarea(&selector, "*"));
+            let onclick = Callback::from(move |_: MouseEvent| replace_selected_in_textarea(&selector, ("*", "*")));
             html! {
                 <button class = &self.class style = format!("width: {0}; height: {0}", self.size)
                         type = "button" title = &self.title onclick = onclick>

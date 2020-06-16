@@ -316,7 +316,9 @@ impl ReplaceFmt {
                 selection + prefix_chars
             } else {
                 Selection {
-                    start: selection.start + if before_endline { 0 } else { 1 } + prefix_chars,
+                    start: selection.start
+                        + if before_endline { 0 } else { 1 }
+                        + if lines.len() < 2 { prefix_chars } else { 0 },
                     end: selection.end + if before_endline { 0 } else { 1 } + prefix_chars * lines.len(),
                 }
             };

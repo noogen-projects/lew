@@ -94,7 +94,7 @@ impl RichEditor {
 
     fn type_item(&mut self, item: &str) {
         self.text.insert_str(self.caret_index, item);
-        self.caret_index = self.caret_index + item.len();
+        self.caret_index += item.len();
     }
 
     fn before_char_len(&self) -> usize {

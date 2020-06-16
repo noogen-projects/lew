@@ -25,6 +25,7 @@
 
 .lew-simple__toolbar_item {
     fill: #505357;
+    padding: 0 5px;
 }
 
 .lew-simple__toolbar_item:hover {

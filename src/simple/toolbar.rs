@@ -25,6 +25,12 @@ impl Default for SimpleToolbar {
                 Box::new(tool::Bold::new()),
                 Box::new(tool::Italic::new()),
                 Box::new(tool::Quote::new()),
+                Box::new(tool::Code::new()),
+                Box::new(tool::Link::new()),
+                Box::new(tool::ImageLink::new()),
+                Box::new(tool::BulletedList::new()),
+                Box::new(tool::OrderedList::new()),
+                Box::new(tool::TaskList::new()),
             ],
         }
     }
@@ -119,31 +125,42 @@ impl SubAssign<usize> for Selection {
     }
 }
 
+pub fn textarea_selection(textarea_selector: impl AsRef<str>) -> Option<(HtmlTextAreaElement, String, Selection)> {
+    let element = utils::document().query_selector(textarea_selector.as_ref()).ok()??;
+    let textarea = element.dyn_into::<HtmlTextAreaElement>().ok()?;
+    let text = textarea.value();
+    let start_char = textarea
+        .selection_start()
+        .map(|start| start.unwrap_or(0) as usize)
+        .unwrap_or(0);
+    let mut end_char = textarea
+        .selection_end()
+        .map(|end| end.unwrap_or(0) as usize)
+        .unwrap_or(0);
+    if end_char < start_char {
+        end_char = start_char;
+    }
+
+    Some((
+        textarea,
+        text,
+        Selection {
+            start: start_char,
+            end: end_char,
+        },
+    ))
+}
+
 pub fn replace_selected_in_textarea(
-    textarea_selector: impl AsRef<str>, fmt: impl Into<ReplaceFmt>, mode: UnselectedApplyMode,
+    selection: Option<(HtmlTextAreaElement, String, Selection)>, fmt: impl Into<ReplaceFmt>, mode: UnselectedApplyMode,
 ) {
-    if let Ok(Some(element)) = utils::document().query_selector(textarea_selector.as_ref()) {
-        if let Ok(textarea) = element.dyn_into::<HtmlTextAreaElement>() {
-            let text = textarea.value();
-            let start_char = textarea
-                .selection_start()
-                .map(|start| start.unwrap_or(0) as usize)
-                .unwrap_or(0);
-            let mut end_char = textarea
-                .selection_end()
-                .map(|end| end.unwrap_or(0) as usize)
-                .unwrap_or(0);
-            if end_char < start_char {
-                end_char = start_char;
-            }
+    if let Some((textarea, text, selection)) = selection {
+        let (text, selection) = fmt.into().layout(text, selection, mode);
 
-            let (text, selection) = fmt.into().layout(text, start_char..end_char, mode);
-
-            textarea.set_value(&text);
-            textarea.focus().ok();
-            textarea.set_selection_start(Some(selection.start as u32)).ok();
-            textarea.set_selection_end(Some(selection.end as u32)).ok();
-        }
+        textarea.set_value(&text);
+        textarea.focus().ok();
+        textarea.set_selection_start(Some(selection.start as u32)).ok();
+        textarea.set_selection_end(Some(selection.end as u32)).ok();
     }
 }
 
@@ -230,7 +247,7 @@ impl ReplaceFmt {
         let result_text;
         let result_selection;
 
-        if is_prefixed_lines && (before.ends_with(&block_prefix) || &before == prefix) {
+        if is_prefixed_lines && (before.ends_with(&block_prefix) || before == prefix) {
             let mut target = String::new();
             for (idx, line) in lines.iter().enumerate() {
                 if idx > 0 {

@@ -1,6 +1,7 @@
 use lew::{toolbar::textarea_selection, SimpleEditor, SimpleToolbar, Widget};
+use pulldown_cmark::{html as cmark_html, Options, Parser};
 use wasm_bindgen::JsCast;
-use web_sys::{Element, HtmlInputElement};
+use web_sys::HtmlInputElement;
 use yew::{html, utils, Component, ComponentLink, Html, InputData, MouseEvent};
 
 const EDITOR_ID: &str = "editor";
@@ -16,10 +17,10 @@ impl Widget for Preview {
         let click = |_: MouseEvent| {
             if is_preview_enabled() {
                 if let Some((_, text, _)) = textarea_selection(format!("#{} > textarea", EDITOR_ID)) {
-                    get_preview_container().set_inner_html(&text);
+                    set_preview(&text);
                 }
             } else {
-                get_preview_container().set_inner_html("");
+                set_preview("");
             }
         };
 
@@ -68,10 +69,23 @@ impl Component for Root {
     }
 }
 
-fn get_preview_container() -> Element {
-    utils::document()
+fn get_parser(text: &str) -> Parser {
+    let mut options = Options::empty();
+    options.insert(Options::ENABLE_STRIKETHROUGH);
+    options.insert(Options::ENABLE_TASKLISTS);
+
+    Parser::new_ext(text, options)
+}
+
+fn set_preview(text: &str) {
+    let preview = utils::document()
         .get_element_by_id(PREVIEW_ID)
-        .expect("Preview container expected")
+        .expect("Preview container expected");
+
+    let parser = get_parser(text);
+    let mut html_output = String::new();
+    cmark_html::push_html(&mut html_output, parser);
+    preview.set_inner_html(&html_output);
 }
 
 fn is_preview_enabled() -> bool {
@@ -85,7 +99,7 @@ fn is_preview_enabled() -> bool {
 
 fn editor_input(data: InputData) {
     if is_preview_enabled() {
-        get_preview_container().set_inner_html(&data.value);
+        set_preview(&data.value);
     }
 }
 

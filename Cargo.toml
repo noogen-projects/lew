@@ -19,4 +19,4 @@ web-sys = { version = "0.3", features = ["HtmlTextAreaElement", "Event", "EventT
 [dev-dependencies]
 pulldown-cmark = "0.7.1"
 tiny_http = "0.7.0"
-web-sys = { version = "0.3", features = ["Element", "HtmlInputElement"] }
+web-sys = { version = "0.3", features = ["HtmlInputElement"] }

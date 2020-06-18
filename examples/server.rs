@@ -28,6 +28,7 @@ fn main() {
             static_path.join("simple.html")
         };
 
+        println!("    Response file: {}", file_path.display());
         let mut response = Response::from_file(File::open(&file_path).unwrap());
         let content_type = match file_path.extension().and_then(OsStr::to_str) {
             Some("js") => "Content-Type: application/javascript",

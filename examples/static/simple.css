@@ -39,7 +39,7 @@
     border: 0;
     background-color: transparent;
     box-shadow: none;
-    padding: 0;
+    padding: 4px;
     cursor: pointer;
     user-select: none;
     touch-action: manipulation;

@@ -14,7 +14,9 @@ categories = []
 derive_more = "0.99"
 yew = "0.16"
 wasm-bindgen = "0.2"
-web-sys = { version = "0.3", features = ["HtmlTextAreaElement"] }
+web-sys = { version = "0.3", features = ["HtmlTextAreaElement", "Event", "EventTarget"] }
 
 [dev-dependencies]
+pulldown-cmark = "0.7.1"
 tiny_http = "0.7.0"
+web-sys = { version = "0.3", features = ["Element", "HtmlInputElement"] }

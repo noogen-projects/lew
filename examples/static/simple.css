@@ -21,15 +21,19 @@
     margin: 0;
     padding: 5px 0;
     list-style: none;
+    font-family: BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
+    font-size: 16px;
 }
 
 .lew-simple__toolbar_item {
     fill: #505357;
+    color: #505357;
     padding: 0 5px;
 }
 
 .lew-simple__toolbar_item:hover {
     fill: #0560d5;
+    color: #0560d5;
 }
 
 .lew-simple__tool_button {
@@ -46,4 +50,18 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+.lew-simple__toolbar_item:first-child {
+    margin-right: 20px;
+}
+
+#preview_label {
+    padding-left: 4px;
+}
+
+#preview_checkbox, #preview_label {
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
 }

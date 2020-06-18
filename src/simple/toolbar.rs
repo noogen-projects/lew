@@ -2,7 +2,7 @@ use std::ops::{Add, AddAssign, Range, Sub, SubAssign};
 
 use derive_more::{Add, AddAssign, Sub, SubAssign};
 use wasm_bindgen::JsCast;
-use web_sys::HtmlTextAreaElement;
+use web_sys::{Event, EventTarget, HtmlTextAreaElement};
 use yew::{html, utils, Html};
 
 use crate::Widget;
@@ -159,8 +159,16 @@ pub fn replace_selected_in_textarea(
 
         textarea.set_value(&text);
         textarea.focus().ok();
-        textarea.set_selection_start(Some(selection.start as u32)).ok();
-        textarea.set_selection_end(Some(selection.end as u32)).ok();
+        textarea
+            .set_selection_start(Some(selection.start as u32))
+            .expect("Set selection start failed");
+        textarea
+            .set_selection_end(Some(selection.end as u32))
+            .expect("Set selection end failed");
+        let target: &EventTarget = textarea.as_ref();
+        target
+            .dispatch_event(&Event::new("input").expect("Input event expected"))
+            .expect("Dispatch failed");
     }
 }
 

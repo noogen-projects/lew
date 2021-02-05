@@ -69,7 +69,7 @@ impl Component for Root {
     }
 }
 
-fn get_parser(text: &str) -> Parser {
+fn new_cmark_parser(text: &str) -> Parser {
     let mut options = Options::empty();
     options.insert(Options::ENABLE_STRIKETHROUGH);
     options.insert(Options::ENABLE_TASKLISTS);
@@ -82,9 +82,11 @@ fn set_preview(text: &str) {
         .get_element_by_id(PREVIEW_ID)
         .expect("Preview container expected");
 
-    let parser = get_parser(text);
+    let parser = new_cmark_parser(text);
+
     let mut html_output = String::new();
     cmark_html::push_html(&mut html_output, parser);
+
     preview.set_inner_html(&html_output);
 }
 

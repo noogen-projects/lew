@@ -1,44 +1,14 @@
-use std::{ffi::OsStr, fs::File, path::Path, str::FromStr};
+use std::path::Path;
 
-use tiny_http::{Header, Response, Server};
+use env_logger::{Builder, Env};
+use tiny_file_server::FileServer;
 
 fn main() {
-    let addr = "127.0.0.1:9080";
-    let server = Server::http(addr).unwrap();
-    println!("Lew example server started on {}", addr);
+    Builder::from_env(Env::default().default_filter_or("debug")).init();
 
-    let static_path = Path::new("examples").join("static");
-
-    for request in server.incoming_requests() {
-        println!(
-            "Received request. Method: {:?}, url: {:?}, headers: {:?}",
-            request.method(),
-            request.url(),
-            request.headers()
-        );
-
-        if request.url() == "/favicon.ico" {
-            request.respond(Response::empty(404)).unwrap();
-            continue;
-        }
-
-        let file_path = if request.url().len() > 1 {
-            static_path.join(request.url().trim_start_matches('/'))
-        } else {
-            static_path.join("simple.html")
-        };
-
-        println!("    Response file: {}", file_path.display());
-        let mut response = Response::from_file(File::open(&file_path).unwrap());
-        let content_type = match file_path.extension().and_then(OsStr::to_str) {
-            Some("js") => "Content-Type: application/javascript",
-            Some("wasm") => "Content-Type: application/wasm",
-            Some("html") => "Content-Type: text/html",
-            Some("css") => "Content-Type: text/css",
-            _ => "Content-Type: text/plain",
-        };
-        response.add_header(Header::from_str(content_type).unwrap());
-
-        request.respond(response).unwrap();
-    }
+    FileServer::http("127.0.0.1:9080")
+        .expect("Server should be created")
+        .with_default_file("simple.html")
+        .run(Path::new("examples").join("static"))
+        .expect("Server should start");
 }

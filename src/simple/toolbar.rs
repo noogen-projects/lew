@@ -141,18 +141,16 @@ pub fn textarea_selection(textarea_selector: impl AsRef<str>) -> Option<(HtmlTex
         end_char = start_char;
     }
 
-    Some((
-        textarea,
-        text,
-        Selection {
-            start: start_char,
-            end: end_char,
-        },
-    ))
+    Some((textarea, text, Selection {
+        start: start_char,
+        end: end_char,
+    }))
 }
 
 pub fn replace_selected_in_textarea(
-    selection: Option<(HtmlTextAreaElement, String, Selection)>, fmt: impl Into<ReplaceFmt>, mode: UnselectedApplyMode,
+    selection: Option<(HtmlTextAreaElement, String, Selection)>,
+    fmt: impl Into<ReplaceFmt>,
+    mode: UnselectedApplyMode,
 ) {
     if let Some((textarea, text, selection)) = selection {
         let (text, selection) = fmt.into().layout(text, selection, mode);
@@ -179,7 +177,10 @@ pub enum ReplaceFmt {
 
 impl ReplaceFmt {
     pub fn layout(
-        &self, text: String, selection: impl Into<Selection>, mode: UnselectedApplyMode,
+        &self,
+        text: String,
+        selection: impl Into<Selection>,
+        mode: UnselectedApplyMode,
     ) -> (String, Selection) {
         let text: Vec<_> = text.chars().collect();
         let selection = selection.into();
@@ -207,7 +208,11 @@ impl ReplaceFmt {
     }
 
     fn around_layout(
-        text: Vec<char>, prefix: &str, suffix: &str, selection: Selection, replacement: Selection,
+        text: Vec<char>,
+        prefix: &str,
+        suffix: &str,
+        selection: Selection,
+        replacement: Selection,
     ) -> (String, Selection) {
         let before: String = text[..replacement.start].iter().collect();
         let source: String = text[replacement.start..replacement.end].iter().collect();
@@ -242,7 +247,10 @@ impl ReplaceFmt {
     }
 
     fn start_line_layout(
-        text: Vec<char>, prefix: &str, selection: Selection, replacement: Selection,
+        text: Vec<char>,
+        prefix: &str,
+        selection: Selection,
+        replacement: Selection,
     ) -> (String, Selection) {
         let before: String = text[..replacement.start].iter().collect();
         let source: String = text[replacement.start..replacement.end].iter().collect();

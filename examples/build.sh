@@ -2,7 +2,7 @@
 
 example=${1}
 mode=${2:+"--release"}
-flags=${2:+"-Clto -Copt-level=s"}
+flags=${2:+"-Copt-level=s"}
 out_dir=${2:-debug}
 
 RUSTFLAGS=$flags cargo build --example $example --target wasm32-unknown-unknown $mode

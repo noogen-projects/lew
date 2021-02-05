@@ -141,7 +141,3 @@ impl RichEditor {
         }
     }
 }
-
-fn info(msg: &str) {
-    yew::services::ConsoleService::new().info(msg);
-}

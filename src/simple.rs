@@ -97,12 +97,11 @@ impl Component for SimpleEditor {
     }
 
     fn view(&self) -> Html {
-        let input = self.oninput;
         html! {
             <div id = &self.id class = &self.class>
                 { self.toolbar.as_ref().cloned().unwrap_or(html! {}) }
                 <textarea cols = self.cols rows = self.rows class = "lew-simple__textarea"
-                        name = &self.name placeholder = &self.placeholder oninput = self.link.callback(move |data| input(data))>
+                        name = &self.name placeholder = &self.placeholder oninput = self.link.callback(self.oninput)>
                     { &self.text }
                 </textarea>
             </div>

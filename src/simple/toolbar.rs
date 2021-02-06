@@ -18,8 +18,16 @@ pub struct SimpleToolbar {
 impl Default for SimpleToolbar {
     fn default() -> Self {
         Self {
-            id: "".to_string(),
+            id: Default::default(),
             class: "lew-simple__toolbar".to_string(),
+            tools: Default::default(),
+        }
+    }
+}
+
+impl SimpleToolbar {
+    pub fn new() -> Self {
+        Self {
             tools: vec![
                 Box::new(tool::Header::new()),
                 Box::new(tool::Bold::new()),
@@ -32,13 +40,8 @@ impl Default for SimpleToolbar {
                 Box::new(tool::OrderedList::new()),
                 Box::new(tool::TaskList::new()),
             ],
+            ..Self::default()
         }
-    }
-}
-
-impl SimpleToolbar {
-    pub fn new() -> Self {
-        Self::default()
     }
 
     pub fn with_id(mut self, id: impl Into<String>) -> Self {
@@ -48,6 +51,11 @@ impl SimpleToolbar {
 
     pub fn with_class(mut self, class: impl Into<String>) -> Self {
         self.class = class.into();
+        self
+    }
+
+    pub fn add_tool(mut self, tool: impl Widget + 'static) -> Self {
+        self.tools.push(Box::new(tool));
         self
     }
 }
@@ -65,6 +73,12 @@ impl Widget for SimpleToolbar {
                 }
             </ul>
         }
+    }
+}
+
+impl From<SimpleToolbar> for Html {
+    fn from(toolbar: SimpleToolbar) -> Self {
+        toolbar.build()
     }
 }
 
@@ -141,10 +155,14 @@ pub fn textarea_selection(textarea_selector: impl AsRef<str>) -> Option<(HtmlTex
         end_char = start_char;
     }
 
-    Some((textarea, text, Selection {
-        start: start_char,
-        end: end_char,
-    }))
+    Some((
+        textarea,
+        text,
+        Selection {
+            start: start_char,
+            end: end_char,
+        },
+    ))
 }
 
 pub fn replace_selected_in_textarea(

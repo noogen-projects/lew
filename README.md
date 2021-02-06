@@ -13,7 +13,7 @@ cargo install wasm-bindgen-cli
 Build wasm client example:
 
 ```shell script
-./examples/build.sh <example>
+./examples/build.sh <example> release
 ```
 
 Run example server:
@@ -44,17 +44,17 @@ cargo +nightly fmt -- --check
 cargo +nightly fmt
 ```
 
-Enable autoformatting for IntelliJ IDEA with the Rust plugin:
+To enable autoformatting for IntelliJ IDEA with the Rust plugin:
 
-`Settings -> Languages and Frameworks -> Rust -> Rustfmt -> Run rustfmt on Save`
+`File -> Settings -> Languages & Frameworks -> Rust -> Rustfmt, check "Run rustfmt on Save"`
 
-Run clippy:
+To run clippy, use the following command:
 
 ```shell script
 cargo clippy --all-targets --all-features -- -D warnings
 ```
 
-Setup git hook:
+To setup git hook, use the following command:
 
 ```shell script
 cp .git-pre-push.sh .git/hooks/pre-push

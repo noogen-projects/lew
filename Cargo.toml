@@ -11,7 +11,10 @@ readme = "README.md"
 repository = "https://github.com/noogen-projects/lew"
 description = "A Rust library that implements a lightweight editor for Web with WebAssembly"
 keywords = ["noogen", "editor", "web", "wasm"]
-categories = []
+categories = ["web-programming"]
+exclude = [
+    ".git-pre-push.sh",
+]
 
 [profile.release]
 lto = true

@@ -1,4 +1,4 @@
-use yew::{html, Component, ComponentLink, Html, InputData, Properties};
+use yew::{html, Callback, Component, ComponentLink, Html, InputData, Properties};
 
 pub use self::toolbar::SimpleToolbar;
 use crate::Widget;
@@ -14,8 +14,7 @@ pub struct SimpleEditor {
     placeholder: String,
     text: String,
     toolbar: Option<Html>,
-    oninput: fn(InputData),
-    link: ComponentLink<Self>,
+    oninput: Callback<InputData>,
 }
 
 #[derive(Clone, Properties)]
@@ -44,15 +43,15 @@ pub struct SimpleEditorProps {
     #[prop_or(Some(SimpleToolbar::new().build()))]
     pub toolbar: Option<Html>,
 
-    #[prop_or(|_| ())]
-    pub oninput: fn(InputData),
+    #[prop_or(Callback::noop())]
+    pub oninput: Callback<InputData>,
 }
 
 impl Component for SimpleEditor {
     type Message = ();
     type Properties = SimpleEditorProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+    fn create(props: Self::Properties, _link: ComponentLink<Self>) -> Self {
         Self {
             id: props.id,
             class: props.class,
@@ -63,7 +62,6 @@ impl Component for SimpleEditor {
             text: props.text,
             toolbar: props.toolbar,
             oninput: props.oninput,
-            link,
         }
     }
 
@@ -101,7 +99,7 @@ impl Component for SimpleEditor {
             <div id = &self.id class = &self.class>
                 { self.toolbar.as_ref().cloned().unwrap_or(html! {}) }
                 <textarea cols = self.cols rows = self.rows class = "lew-simple__textarea"
-                        name = &self.name placeholder = &self.placeholder oninput = self.link.callback(self.oninput)>
+                        name = &self.name placeholder = &self.placeholder oninput = self.oninput.clone()>
                     { &self.text }
                 </textarea>
             </div>

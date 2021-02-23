@@ -2,7 +2,7 @@ use lew::{toolbar::textarea_selection, SimpleEditor, SimpleToolbar, Widget};
 use pulldown_cmark::{html as cmark_html, Options, Parser};
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
-use yew::{html, utils, Component, ComponentLink, Html, InputData, MouseEvent};
+use yew::{html, utils, Callback, Component, ComponentLink, Html, InputData, MouseEvent};
 
 const EDITOR_ID: &str = "editor";
 const PREVIEW_ID: &str = "preview";
@@ -58,12 +58,11 @@ impl Component for Root {
     }
 
     fn view(&self) -> Html {
-        let input = editor_input as fn(InputData);
         html! {
             <div>
                 <div id = PREVIEW_ID>
                 </div>
-                <SimpleEditor id = EDITOR_ID toolbar = self.toolbar.build() placeholder = "Leave a comment" oninput = input />
+                <SimpleEditor id = EDITOR_ID toolbar = self.toolbar.build() placeholder = "Leave a comment" oninput = Callback::from(editor_input) />
             </div>
         }
     }

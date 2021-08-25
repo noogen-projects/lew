@@ -45,7 +45,7 @@ impl Component for RichEditor {
     fn view(&self) -> Html {
         self.update_content();
         html! {
-            <div id = &self.id class = &self.class>
+            <div id = self.id.clone() class = self.class.clone()>
                 <div class = "lew-rich">
                     { self.generate_content() }
                 </div>

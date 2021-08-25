@@ -96,10 +96,10 @@ impl Component for SimpleEditor {
 
     fn view(&self) -> Html {
         html! {
-            <div id = &self.id class = &self.class>
+            <div id = self.id.clone() class = self.class.clone()>
                 { self.toolbar.as_ref().cloned().unwrap_or(html! {}) }
-                <textarea cols = self.cols rows = self.rows class = "lew-simple__textarea"
-                        name = &self.name placeholder = &self.placeholder oninput = self.oninput.clone()>
+                <textarea cols = self.cols.to_string() rows = self.rows.to_string() class = "lew-simple__textarea"
+                        name = self.name.clone() placeholder = self.placeholder.clone() oninput = self.oninput.clone()>
                     { &self.text }
                 </textarea>
             </div>

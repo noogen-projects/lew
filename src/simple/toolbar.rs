@@ -64,7 +64,7 @@ impl Widget for SimpleToolbar {
     fn build(&self) -> Html {
         let item_class = format!("{}_item", self.class);
         html! {
-            <ul id = &self.id class = &self.class>
+            <ul id = self.id.clone() class = self.class.clone()>
                 {
                     self.tools
                         .iter()
@@ -337,7 +337,7 @@ impl ReplaceFmt {
             if !before_endline {
                 target.push('\n');
             }
-            target.push_str(&prefix);
+            target.push_str(prefix);
             for (idx, line) in lines.iter().enumerate() {
                 if idx > 0 {
                     target.push_str(&block_prefix);

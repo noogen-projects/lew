@@ -1,4 +1,4 @@
-use yew::{html, Callback, Component, ComponentLink, Html, InputData, Properties};
+use yew::{html, Callback, Component, Context, Html, InputEvent, Properties};
 
 pub use self::toolbar::SimpleToolbar;
 use crate::Widget;
@@ -14,10 +14,10 @@ pub struct SimpleEditor {
     placeholder: String,
     text: String,
     toolbar: Option<Html>,
-    oninput: Callback<InputData>,
+    oninput: Callback<InputEvent>,
 }
 
-#[derive(Clone, Properties)]
+#[derive(Clone, Properties, PartialEq)]
 pub struct SimpleEditorProps {
     #[prop_or_default]
     pub id: String,
@@ -44,32 +44,28 @@ pub struct SimpleEditorProps {
     pub toolbar: Option<Html>,
 
     #[prop_or(Callback::noop())]
-    pub oninput: Callback<InputData>,
+    pub oninput: Callback<InputEvent>,
 }
 
 impl Component for SimpleEditor {
     type Message = ();
     type Properties = SimpleEditorProps;
 
-    fn create(props: Self::Properties, _link: ComponentLink<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         Self {
-            id: props.id,
-            class: props.class,
-            cols: props.cols,
-            rows: props.rows,
-            name: props.name,
-            placeholder: props.placeholder,
-            text: props.text,
-            toolbar: props.toolbar,
-            oninput: props.oninput,
+            id: ctx.props().id.clone(),
+            class: ctx.props().class.clone(),
+            cols: ctx.props().cols,
+            rows: ctx.props().rows,
+            name: ctx.props().name.clone(),
+            placeholder: ctx.props().placeholder.clone(),
+            text: ctx.props().text.clone(),
+            toolbar: ctx.props().toolbar.clone(),
+            oninput: ctx.props().oninput.clone(),
         }
     }
 
-    fn update(&mut self, _msg: Self::Message) -> bool {
-        false
-    }
-
-    fn change(&mut self, props: Self::Properties) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
         let SimpleEditorProps {
             id,
             class,
@@ -80,7 +76,7 @@ impl Component for SimpleEditor {
             text,
             toolbar,
             oninput,
-        } = props;
+        } = ctx.props().clone();
 
         self.id = id;
         self.class = class;
@@ -94,12 +90,12 @@ impl Component for SimpleEditor {
         true
     }
 
-    fn view(&self) -> Html {
+    fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
-            <div id = self.id.clone() class = self.class.clone()>
+            <div id = { self.id.clone() } class = { self.class.clone() }>
                 { self.toolbar.as_ref().cloned().unwrap_or(html! {}) }
-                <textarea cols = self.cols.to_string() rows = self.rows.to_string() class = "lew-simple__textarea"
-                        name = self.name.clone() placeholder = self.placeholder.clone() oninput = self.oninput.clone()>
+                <textarea cols = { self.cols.to_string() } rows = { self.rows.to_string() } class = "lew-simple__textarea"
+                        name = { self.name.clone() } placeholder = { self.placeholder.clone() } oninput = { self.oninput.clone() }>
                     { &self.text }
                 </textarea>
             </div>

@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use yew::{html, utils, Component, ComponentLink, Html, Properties};
+use yew::{html, Component, Context, Html, Properties};
 
 pub struct RichEditor {
     id: String,
@@ -9,7 +9,7 @@ pub struct RichEditor {
     text: String,
 }
 
-#[derive(Clone, Properties, Default)]
+#[derive(Clone, Properties, Default, PartialEq)]
 pub struct RichEditorProps {
     pub id: String,
     pub class: String,
@@ -21,31 +21,27 @@ impl Component for RichEditor {
     type Message = ();
     type Properties = RichEditorProps;
 
-    fn create(props: Self::Properties, _link: ComponentLink<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         Self {
-            id: props.id,
-            class: props.class,
-            caret_index: props.caret_index,
-            text: props.text,
+            id: ctx.props().id.clone(),
+            class: ctx.props().class.clone(),
+            caret_index: ctx.props().caret_index,
+            text: ctx.props().text.clone(),
         }
     }
 
-    fn update(&mut self, _msg: Self::Message) -> bool {
-        false
-    }
-
-    fn change(&mut self, props: Self::Properties) -> bool {
-        self.id = props.id;
-        self.class = props.class;
-        self.caret_index = props.caret_index;
-        self.text = props.text;
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        self.id = ctx.props().id.clone();
+        self.class = ctx.props().class.clone();
+        self.caret_index = ctx.props().caret_index;
+        self.text = ctx.props().text.clone();
         true
     }
 
-    fn view(&self) -> Html {
+    fn view(&self, _ctx: &Context<Self>) -> Html {
         self.update_content();
         html! {
-            <div id = self.id.clone() class = self.class.clone()>
+            <div id = { self.id.clone() } class = { self.class.clone() }>
                 <div class = "lew-rich">
                     { self.generate_content() }
                 </div>
@@ -79,7 +75,7 @@ impl RichEditor {
     }
 
     fn update_content(&self) {
-        let _document = utils::document();
+        // let _document = document();
         // let editor = if self.id.is_empty() {
         //     document.get_elements_by_class_name("lew-editor").item(0)
         // } else {

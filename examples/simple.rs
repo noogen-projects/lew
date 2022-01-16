@@ -1,15 +1,15 @@
-use lew::{toolbar::textarea_selection, SimpleEditor, SimpleToolbar, Widget};
+use lew::{dom, toolbar::textarea_selection, SimpleEditor, SimpleToolbar, Widget};
 use pulldown_cmark::{html as cmark_html, Options, Parser};
 use wasm_bindgen::JsCast;
-use web_sys::HtmlInputElement;
-use yew::{html, utils, Callback, Component, ComponentLink, Html, InputData, MouseEvent};
+use web_sys::{HtmlInputElement, HtmlTextAreaElement};
+use yew::{html, html::Scope, Callback, Component, Context, Html, InputEvent, MouseEvent};
 
 const EDITOR_ID: &str = "editor";
 const PREVIEW_ID: &str = "preview";
 const PREVIEW_CHECKBOX_ID: &str = "preview_checkbox";
 
 struct Preview {
-    link: ComponentLink<Root>,
+    link: Scope<Root>,
 }
 
 impl Widget for Preview {
@@ -26,9 +26,9 @@ impl Widget for Preview {
 
         html! {
             <div id = "preview_tool">
-                <input type = "checkbox" id = PREVIEW_CHECKBOX_ID name = PREVIEW_CHECKBOX_ID
-                        onclick = self.link.callback(click)/>
-                <label for = PREVIEW_CHECKBOX_ID id = "preview_label">{ "Preview" }</label>
+                <input type = "checkbox" id = { PREVIEW_CHECKBOX_ID } name = { PREVIEW_CHECKBOX_ID }
+                        onclick = { self.link.callback(click) }/>
+                <label for = { PREVIEW_CHECKBOX_ID } id = "preview_label">{ "Preview" }</label>
             </div>
         }
     }
@@ -42,27 +42,24 @@ impl Component for Root {
     type Message = ();
     type Properties = ();
 
-    fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         let mut toolbar = SimpleToolbar::new();
-        toolbar.tools.insert(0, Box::new(Preview { link }));
+        toolbar.tools.insert(
+            0,
+            Box::new(Preview {
+                link: ctx.link().clone(),
+            }),
+        );
 
         Self { toolbar }
     }
 
-    fn update(&mut self, _msg: Self::Message) -> bool {
-        false
-    }
-
-    fn change(&mut self, _props: Self::Properties) -> bool {
-        false
-    }
-
-    fn view(&self) -> Html {
+    fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <div>
-                <div id = PREVIEW_ID>
+                <div id = { PREVIEW_ID }>
                 </div>
-                <SimpleEditor id = EDITOR_ID toolbar = self.toolbar.build() placeholder = "Leave a comment" oninput = Callback::from(editor_input) />
+                <SimpleEditor id = { EDITOR_ID } toolbar = { self.toolbar.build() } placeholder = "Leave a comment" oninput = { Callback::from(editor_input) } />
             </div>
         }
     }
@@ -77,7 +74,7 @@ fn new_cmark_parser(text: &str) -> Parser {
 }
 
 fn set_preview(text: &str) {
-    let preview = utils::document()
+    let preview = dom::document()
         .get_element_by_id(PREVIEW_ID)
         .expect("Preview container expected");
 
@@ -90,7 +87,7 @@ fn set_preview(text: &str) {
 }
 
 fn is_preview_enabled() -> bool {
-    utils::document()
+    dom::document()
         .get_element_by_id(PREVIEW_CHECKBOX_ID)
         .expect("Preview checkbox expected")
         .dyn_into::<HtmlInputElement>()
@@ -98,9 +95,16 @@ fn is_preview_enabled() -> bool {
         .checked()
 }
 
-fn editor_input(data: InputData) {
+fn editor_input(_event: InputEvent) {
     if is_preview_enabled() {
-        set_preview(&data.value);
+        let value = dom::document()
+            .query_selector("textarea")
+            .expect("Query selector error")
+            .expect("Textarea are expected")
+            .dyn_into::<HtmlTextAreaElement>()
+            .expect("Textarea mus be html element")
+            .value();
+        set_preview(&value);
     }
 }
 

@@ -3,9 +3,9 @@ use std::ops::{Add, AddAssign, Range, Sub, SubAssign};
 use derive_more::{Add, AddAssign, Sub, SubAssign};
 use wasm_bindgen::JsCast;
 use web_sys::{Event, EventTarget, HtmlTextAreaElement};
-use yew::{html, utils, Html};
+use yew::{html, Html};
 
-use crate::Widget;
+use crate::{dom, Widget};
 
 pub mod tool;
 
@@ -64,11 +64,11 @@ impl Widget for SimpleToolbar {
     fn build(&self) -> Html {
         let item_class = format!("{}_item", self.class);
         html! {
-            <ul id = self.id.clone() class = self.class.clone()>
+            <ul id = { self.id.clone() } class = { self.class.clone() }>
                 {
                     self.tools
                         .iter()
-                        .map(|tool| html! { <li class = &item_class>{ tool.build() }</li> })
+                        .map(|tool| html! { <li class = { &item_class }>{ tool.build() }</li> })
                         .collect::<Html>()
                 }
             </ul>
@@ -140,7 +140,7 @@ impl SubAssign<usize> for Selection {
 }
 
 pub fn textarea_selection(textarea_selector: impl AsRef<str>) -> Option<(HtmlTextAreaElement, String, Selection)> {
-    let element = utils::document().query_selector(textarea_selector.as_ref()).ok()??;
+    let element = dom::document().query_selector(textarea_selector.as_ref()).ok()??;
     let textarea = element.dyn_into::<HtmlTextAreaElement>().ok()?;
     let text = textarea.value();
     let start_char = textarea
@@ -155,14 +155,10 @@ pub fn textarea_selection(textarea_selector: impl AsRef<str>) -> Option<(HtmlTex
         end_char = start_char;
     }
 
-    Some((
-        textarea,
-        text,
-        Selection {
-            start: start_char,
-            end: end_char,
-        },
-    ))
+    Some((textarea, text, Selection {
+        start: start_char,
+        end: end_char,
+    }))
 }
 
 pub fn replace_selected_in_textarea(

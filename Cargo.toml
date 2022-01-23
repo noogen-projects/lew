@@ -1,6 +1,6 @@
 [package]
 name = "lew"
-version = "0.3.0"
+version = "0.4.0"
 authors = [
     "Alexander Mescheryakov <freecoder.xx@gmail.com>",
     "Noogen Team <info.noogen@gmail.com>",

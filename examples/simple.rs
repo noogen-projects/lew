@@ -1,6 +1,6 @@
-use lew::{dom, toolbar::textarea_selection, SimpleEditor, SimpleToolbar, Widget};
+use lew::{toolbar::textarea_selection, SimpleEditor, SimpleToolbar, Widget};
 use pulldown_cmark::{html as cmark_html, Options, Parser};
-use wasm_bindgen::JsCast;
+use wasm_dom::JsCast;
 use web_sys::{HtmlInputElement, HtmlTextAreaElement};
 use yew::{html, html::Scope, Callback, Component, Context, Html, InputEvent, MouseEvent};
 
@@ -74,7 +74,7 @@ fn new_cmark_parser(text: &str) -> Parser {
 }
 
 fn set_preview(text: &str) {
-    let preview = dom::document()
+    let preview = wasm_dom::existing::document()
         .get_element_by_id(PREVIEW_ID)
         .expect("Preview container expected");
 
@@ -87,7 +87,7 @@ fn set_preview(text: &str) {
 }
 
 fn is_preview_enabled() -> bool {
-    dom::document()
+    wasm_dom::existing::document()
         .get_element_by_id(PREVIEW_CHECKBOX_ID)
         .expect("Preview checkbox expected")
         .dyn_into::<HtmlInputElement>()
@@ -97,7 +97,7 @@ fn is_preview_enabled() -> bool {
 
 fn editor_input(_event: InputEvent) {
     if is_preview_enabled() {
-        let value = dom::document()
+        let value = wasm_dom::existing::document()
             .query_selector("textarea")
             .expect("Query selector error")
             .expect("Textarea are expected")

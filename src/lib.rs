@@ -1,6 +1,5 @@
 pub use self::{rich::*, simple::*};
 
-pub mod dom;
 mod rich;
 mod simple;
 

@@ -5,7 +5,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{Event, EventTarget, HtmlTextAreaElement};
 use yew::{html, Html};
 
-use crate::{dom, Widget};
+use crate::Widget;
 
 pub mod tool;
 
@@ -140,7 +140,9 @@ impl SubAssign<usize> for Selection {
 }
 
 pub fn textarea_selection(textarea_selector: impl AsRef<str>) -> Option<(HtmlTextAreaElement, String, Selection)> {
-    let element = dom::document().query_selector(textarea_selector.as_ref()).ok()??;
+    let element = wasm_dom::existing::document()
+        .query_selector(textarea_selector.as_ref())
+        .ok()??;
     let textarea = element.dyn_into::<HtmlTextAreaElement>().ok()?;
     let text = textarea.value();
     let start_char = textarea
@@ -155,10 +157,14 @@ pub fn textarea_selection(textarea_selector: impl AsRef<str>) -> Option<(HtmlTex
         end_char = start_char;
     }
 
-    Some((textarea, text, Selection {
-        start: start_char,
-        end: end_char,
-    }))
+    Some((
+        textarea,
+        text,
+        Selection {
+            start: start_char,
+            end: end_char,
+        },
+    ))
 }
 
 pub fn replace_selected_in_textarea(

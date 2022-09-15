@@ -109,5 +109,5 @@ fn editor_input(_event: InputEvent) {
 }
 
 fn main() {
-    yew::start_app::<Root>();
+    yew::Renderer::<Root>::new().render();
 }

@@ -30,7 +30,7 @@ impl Component for RichEditor {
         }
     }
 
-    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         self.id = ctx.props().id.clone();
         self.class = ctx.props().class.clone();
         self.caret_index = ctx.props().caret_index;

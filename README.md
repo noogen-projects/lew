@@ -6,20 +6,20 @@ The Lightweight Editor for Web.
 
 Setup dependencies:
 
-```shell script
-cargo install wasm-bindgen-cli
+```shell
+cargo install wasm-bindgen-cli cargo-make
 ```
 
-Build wasm client example:
+Build wasm client examples:
 
-```shell script
-./examples/build.sh <example> release
+```shell
+cargo make examples -p release
 ```
 
-Run example server:
+Run examples server:
 
-```shell script
-cargo run --example server
+```shell
+cargo make run
 ```
 
 
@@ -40,22 +40,12 @@ cargo test --all-features --all-targets
 Check and perform formatting:
 
 ```shell script
-cargo +nightly fmt -- --check
-cargo +nightly fmt
+cargo make checkfmt
+cargo make fmt
 ```
-
-To enable autoformatting for IntelliJ IDEA with the Rust plugin:
-
-`File -> Settings -> Languages & Frameworks -> Rust -> Rustfmt, check "Run rustfmt on Save"`
 
 To run clippy, use the following command:
 
 ```shell script
-cargo clippy --all-targets --all-features -- -D warnings
-```
-
-To setup git hook, use the following command:
-
-```shell script
-cp .git-pre-push.sh .git/hooks/pre-push
+cargo make clippy
 ```

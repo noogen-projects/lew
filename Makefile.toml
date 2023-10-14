@@ -1,0 +1,60 @@
+[config]
+default_to_workspace = false
+additional_profiles = ["debug"]
+
+[tasks.set_vars.env]
+RUSTFLAGS = "-Copt-level=s"
+MODE = "release"
+ADDITIONAL = "--release"
+
+    [tasks.set_vars.env.debug]
+    RUSTFLAGS = ""
+    MODE = "debug"
+    ADDITIONAL = "--color=auto" # it's a stub
+
+[tasks.build_example_simple]
+command = "cargo"
+toolchain = "stable"
+args = ["build", "--example", "simple", "--target", "wasm32-unknown-unknown", "${ADDITIONAL}"]
+dependencies = ["set_vars"]
+
+[tasks.deploy_example_simple]
+command = "wasm-bindgen"
+args = [
+    "--target",
+    "web",
+    "--no-typescript",
+    "--out-dir",
+    "examples/static/target",
+    "--out-name",
+    "simple",
+    "target/wasm32-unknown-unknown/${MODE}/examples/simple.wasm",
+]
+dependencies = ["set_vars"]
+
+[tasks.example_simple]
+dependencies = ["build_example_simple", "deploy_example_simple"]
+
+[tasks.examples]
+dependencies = ["example_simple"]
+
+[tasks.run]
+command = "cargo"
+toolchain = "stable"
+args = ["run", "--example", "server", "${ADDITIONAL}"]
+dependencies = ["examples"]
+
+[tasks.checkfmt]
+command = "cargo"
+toolchain = "nightly"
+args = ["fmt", "--", "--check"]
+
+[tasks.fmt]
+command = "cargo"
+toolchain = "nightly"
+args = ["fmt"]
+
+[tasks.clippy]
+command = "cargo"
+toolchain = "stable"
+args = ["clippy", "--all-targets", "--all-features"]

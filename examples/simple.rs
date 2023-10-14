@@ -1,8 +1,10 @@
-use lew::{toolbar::textarea_selection, SimpleEditor, SimpleToolbar, Widget};
+use lew::toolbar::textarea_selection;
+use lew::{SimpleEditor, SimpleToolbar, Widget};
 use pulldown_cmark::{html as cmark_html, Options, Parser};
 use wasm_dom::JsCast;
 use web_sys::{HtmlInputElement, HtmlTextAreaElement};
-use yew::{html, html::Scope, Callback, Component, Context, Html, InputEvent, MouseEvent};
+use yew::html::Scope;
+use yew::{html, Callback, Component, Context, Html, InputEvent, MouseEvent};
 
 const EDITOR_ID: &str = "editor";
 const PREVIEW_ID: &str = "preview";

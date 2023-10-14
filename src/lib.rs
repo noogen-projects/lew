@@ -1,4 +1,5 @@
-pub use self::{rich::*, simple::*};
+pub use self::rich::*;
+pub use self::simple::*;
 
 mod rich;
 mod simple;

@@ -1,5 +1,4 @@
 use derive_more::{Deref, DerefMut};
-
 use yew::{html, Callback, Html, MouseEvent};
 
 use super::{replace_selected_in_textarea, textarea_selection, ReplaceFmt, UnselectedApplyMode};

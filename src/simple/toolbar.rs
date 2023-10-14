@@ -157,14 +157,10 @@ pub fn textarea_selection(textarea_selector: impl AsRef<str>) -> Option<(HtmlTex
         end_char = start_char;
     }
 
-    Some((
-        textarea,
-        text,
-        Selection {
-            start: start_char,
-            end: end_char,
-        },
-    ))
+    Some((textarea, text, Selection {
+        start: start_char,
+        end: end_char,
+    }))
 }
 
 pub fn replace_selected_in_textarea(
